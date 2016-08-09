@@ -20,6 +20,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+		</dependency>
+		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng-version}</version>
@@ -28,6 +33,12 @@
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<version>${selenium-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
@@ -121,7 +132,7 @@
 					<!-- <suiteXmlFiles> <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile> 
 						</suiteXmlFiles> -->
 					<systemPropertyVariables>
-						<INTERNAL_BASE_URL>${basedir}</INTERNAL_BASE_URL>
+						<INTERNAL_BASE_URL>http://webim.easemob.com/index.html</INTERNAL_BASE_URL>
 						<INTERNAL_USER_NAME>webim001</INTERNAL_USER_NAME>
 						<INTERNAL_USER_PASSWORD>asd</INTERNAL_USER_PASSWORD>
 						<INTERNAL_USER_TOKEN></INTERNAL_USER_TOKEN>
