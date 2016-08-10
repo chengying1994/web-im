@@ -170,10 +170,10 @@ public class FirefoxTest extends WebIMTestBase {
 		WebElement ele = findSpecialFriend(driver, username2, path);
 		sleep(3);
 		logger.info("find message text area");
-		String xpath = "//*[@id='demo']/div/div/div[4]/div[3]/div[2]/textarea";
+		String xpath = "//*[@id='demo']/div/div/div[4]/div[13]/div[2]";
 		ele = findElement(driver, xpath, path);
 		msg = getRandomStr(10);
-		logger.info("talk to friend: {} with message: {}", username2, msg);
+		logger.info("talk to friend: {} with message: {}", username2, msg);	
 		ele.clear();
 		ele.sendKeys(msg);
 		logger.info("send msg");
