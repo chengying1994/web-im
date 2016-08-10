@@ -82,7 +82,7 @@ public class WebIMTestBase {
 		driver.manage().window().maximize();
 		sleep(5);
 		logger.info("find username box and input username: {}", username);
-		String xpath = "//input[@id='username']";
+		String xpath = "//*[@id='demo']/div/div/div[2]/input[1]";
 		WebElement usernameInput = findElementByXpath(driver, xpath);
 		if (null == usernameInput) {
 			screenshot(driver, getPath(path));
@@ -92,7 +92,7 @@ public class WebIMTestBase {
 		usernameInput.sendKeys(username);
 
 		logger.info("find password box and input password: {}", password);
-		xpath = "//input[@id='password']";
+		xpath = "//*[@id='demo']/div/div/div[2]/input[2]";
 		WebElement passwordInput = findElementByXpath(driver, xpath);
 		if (null == passwordInput) {
 			screenshot(driver, getPath(path));
@@ -102,7 +102,7 @@ public class WebIMTestBase {
 		passwordInput.sendKeys(password);
 
 		logger.info("click login button");
-		xpath = "//div[@id='loginmodal']/div[3]/button[1]";
+		xpath = "//*[@id='demo']/div/div/div[2]/button";
 		WebElement login = findElementByXpath(driver, xpath);
 		if (null == login) {
 			screenshot(driver, getPath(path));
@@ -122,7 +122,7 @@ public class WebIMTestBase {
 	}
 
 	public WebElement checkLogin(WebDriver driver) {
-		String xpath = "//a[@id='accordion1']";
+		String xpath = "//*[@id='demo']/div/div/div[4]/div[1]/div[1]/img";
 		WebElement ele = null;
 		try {
 			ele = findElementByXpath(driver, xpath);
@@ -136,13 +136,13 @@ public class WebIMTestBase {
 	public WebElement findSpecialFriend(WebDriver driver, String username, String path) {
 		Preconditions.checkArgument(null != driver, "webdriver was missing");
 		Preconditions.checkArgument(StringUtils.isNotBlank(username), "friend name was missing!");
-		String xpath = "//a[@id='accordion1']";
+		String xpath = "//*[@id='friends']/i[1]";
 		WebElement ele = findElement(driver, xpath, path);
 		if (ele.getAttribute("class").equals("accordion-toggle collapsed")) {
 			ele.click();
 		}
 		sleep(3);
-		xpath = "//ul[@id='contactlistUL']/li[@id='" + username + "']";
+		xpath = "//*[@id='"+username+"']";
 		ele = findElement(driver, xpath, path);
 		if (!StringUtils.isNotBlank(ele.getAttribute("style"))) {
 			ele.click();

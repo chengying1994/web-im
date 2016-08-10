@@ -5,6 +5,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,8 @@ public class FirefoxTest extends WebIMTestBase {
 	public void beforeClass() {
 		logger.info("Start to webim auto test on firefox...");
 		init();
-		driver = new FirefoxDriver();
+		System.setProperty("webdriver.chrome.driver","C:/Program Files (x86)/apache-maven-3.3.9-bin/chromedriver_win32/chromedriver.exe");
+		driver = new ChromeDriver();
 	}
 
 	@Test(enabled = true, groups = { "sanity_test" }, priority = -100)
@@ -52,36 +54,36 @@ public class FirefoxTest extends WebIMTestBase {
 		driver.get(baseUrl);
 		driver.manage().window().maximize();
 		sleep(5);
-		String xpath = "//button[@class='flatbtn-blu'][@tabindex='4']";
+		String xpath = "//*[@id='demo']/div/div/div[2]/p/i";
 		WebElement reg = findElement(driver, xpath, path);
 		reg.click();
 		sleep(5);
-		xpath = "//input[@id='regist_username']";
+		xpath = "//*[@id='demo']/div/div/div[3]/input[1]";
 		WebElement ele = findElement(driver, xpath, path);
 		ele.clear();
 		ele.sendKeys(username2);
 
-		xpath = "//input[@id='regist_password']";
+		xpath = "//*[@id='demo']/div/div/div[3]/input[2]";
 		ele = findElement(driver, xpath, path);
 		ele.clear();
 		ele.sendKeys(password2);
 
-		xpath = "//input[@id='regist_nickname']";
+		xpath = "//*[@id='demo']/div/div/div[3]/input[3]";
 		ele = findElement(driver, xpath, path);
 		ele.clear();
 		ele.sendKeys(nickname2);
 
 		logger.info("click ok button");
-		xpath = "//button[@id='confirm-regist-confirmButton']";
+		xpath = "//*[@id='demo']/div/div/div[3]/button";
 		ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(10);
 
-		Alert alert = driver.switchTo().alert();
-		String text = alert.getText();
-		Assert.assertTrue(text.contains("注册成功"), "alert should indecate successful register");
-		alert.accept();
-		sleep(3);
+//		Alert alert = driver.switchTo().alert();
+//		String text = alert.getText();
+//		Assert.assertTrue(text.contains("注册成功"), "alert should indecate successful register");
+//		alert.accept();
+//		sleep(3);
 		isGetBaseUrl = false;
 	}
 
@@ -91,37 +93,41 @@ public class FirefoxTest extends WebIMTestBase {
 		super.login(driver, username, password, path, isGetBaseUrl);
 	}
 
-	@Test(enabled = true, groups = { "sanity_test" }, dependsOnMethods = { "loginWebIM", "register" })
+	@Test(enabled = true, groups = { "sanity_test" }, dependsOnMethods = { "loginWebIM","register"})
 	public void addFriend() {
 		String path = getScreenshotPath(Thread.currentThread().getStackTrace()[1].getMethodName());
 		logger.info("click add friend button");
 		sleep(5);
-		String xpath = "//button[@class='btn btn-inverse dropdown-toggle'][@data-toggle='dropdown']";
+		String xpath = "//*[@id='demo']/div/div/div[4]/div[1]/div[6]/i";
 		WebElement ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(1);
-		xpath = "//ul[@class='dropdown-menu']/li[@onclick='showAddFriend()']";
+		xpath = "//*[@id='demo']/div/div/div[4]/div[1]/div[6]/ul/li[1]";
 		ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(3);
 		logger.info("input friend id: {}", username2);
-		xpath = "//input[@id='addfridentId']";
+		xpath = "//*[@id='components']/div[2]/div/div[2]/div/input";
 		ele = findElement(driver, xpath, path);
 		ele.clear();
 		ele.sendKeys(username2);
 		sleep(1);
 		logger.info("click add button");
-		xpath = "//button[@id='addFridend']";
+		xpath = "//*[@id='components']/div[2]/div/div[2]/button";
 		ele = findElement(driver, xpath, path);
 		ele.click();
-		sleep(5);
+		sleep(3);
+		xpath="//*[@id='demo']/div/div/div[4]/div[1]/div[6]/i";
+		ele=findElement(driver,xpath,path);
+		ele.click();
+		sleep(3);
 	}
 
 	@Test(enabled = true, groups = { "sanity_test" }, dependsOnMethods = { "addFriend" })
 	public void getFriendList() {
 		logger.info("get friend list");
 		String path = getScreenshotPath(Thread.currentThread().getStackTrace()[1].getMethodName());
-		String xpath = "//ul[@id='contactlistUL']";
+		String xpath = "//*[@id='friends']/i[1]";
 		WebElement ele = findElement(driver, xpath, path);
 		List<WebElement> wl = ele.findElements(By.xpath("//li"));
 		Assert.assertTrue(null != wl && wl.size() > 0, "have found friends");
@@ -130,19 +136,19 @@ public class FirefoxTest extends WebIMTestBase {
 	@Test(enabled = true, groups = { "sanity_test" }, dependsOnMethods = { "getFriendList" })
 	public void loginWebIMWithNewUser() {
 		String path = getScreenshotPath(Thread.currentThread().getStackTrace()[1].getMethodName());
-		driver2 = new FirefoxDriver();
+		driver2 = new ChromeDriver();
 		super.login(driver2, username2, password2, path, true);
 	}
 
 	@Test(enabled = true, groups = { "sanity_test" }, dependsOnMethods = { "loginWebIMWithNewUser" })
 	public void receiveAddFriendConfirmMsg() {
 		String path = getScreenshotPath(Thread.currentThread().getStackTrace()[1].getMethodName());
-		String xpath = "//button[@class='btn btn-primary confirmButton']";
+		String xpath = "//*[@id='"+username+"']/button[1]";
 		WebElement ele = findElement(driver2, xpath, path);
 		ele.click();
 		sleep(3);
 		logger.info("find new friend: {}", username);
-		xpath = "//ul[@id='contactlistUL']/li[@id='" + username + "']";
+		xpath = "//*[@id='"+username+"']";
 		ele = findElement(driver2, xpath, path);
 
 		logger.info("quit driver");
@@ -159,18 +165,19 @@ public class FirefoxTest extends WebIMTestBase {
 	public void sendOffLineMsg() {
 		String path = getScreenshotPath(Thread.currentThread().getStackTrace()[1].getMethodName());
 		super.login(driver, username, password, path, isGetBaseUrl);
+		
 		logger.info("find special friend: {}", username2);
 		WebElement ele = findSpecialFriend(driver, username2, path);
 		sleep(3);
 		logger.info("find message text area");
-		String xpath = "//textarea[@id='talkInputId']";
+		String xpath = "//*[@id='demo']/div/div/div[4]/div[3]/div[2]/textarea";
 		ele = findElement(driver, xpath, path);
 		msg = getRandomStr(10);
 		logger.info("talk to friend: {} with message: {}", username2, msg);
 		ele.clear();
 		ele.sendKeys(msg);
 		logger.info("send msg");
-		xpath = "//li/img[@onclick='sendText()']";
+		xpath = "//*[@id='demo']/div/div/div[4]/div[5]/div[2]/button";
 		ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(3);
@@ -196,13 +203,13 @@ public class FirefoxTest extends WebIMTestBase {
 		WebElement ele = findSpecialFriend(driver, username2, path);
 		sleep(3);
 		logger.info("find message text area");
-		String xpath = "//textarea[@id='talkInputId']";
+		String xpath = "//*[@id='demo']/div/div/div[4]/div[3]/div[2]/textarea";
 		ele = findElement(driver, xpath, path);
 		msg = getRandomStr(10);
 		logger.info("talk to friend: {} with message: {}", username2, msg);
 		ele.sendKeys(msg);
 		logger.info("send msg");
-		xpath = "//li/img[@onclick='sendText()']";
+		xpath = "//*[@id='demo']/div/div/div[4]/div[5]/div[2]/button";
 		ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(3);
