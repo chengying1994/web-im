@@ -82,7 +82,7 @@ public class WebIMTestBase {
 		driver.manage().window().maximize();
 		sleep(5);
 		logger.info("find username box and input username: {}", username);
-		String xpath = "//*[@id='demo']/div/div/div[2]/input[1]";
+		String xpath = "//article[@id='demo']/div/div/div[2]/input[1]";
 		WebElement usernameInput = findElementByXpath(driver, xpath);
 		if (null == usernameInput) {
 			screenshot(driver, getPath(path));
@@ -92,7 +92,7 @@ public class WebIMTestBase {
 		usernameInput.sendKeys(username);
 
 		logger.info("find password box and input password: {}", password);
-		xpath = "//*[@id='demo']/div/div/div[2]/input[2]";
+		xpath = "//article[@id='demo']/div/div/div[2]/input[2]";
 		WebElement passwordInput = findElementByXpath(driver, xpath);
 		if (null == passwordInput) {
 			screenshot(driver, getPath(path));
@@ -102,7 +102,7 @@ public class WebIMTestBase {
 		passwordInput.sendKeys(password);
 
 		logger.info("click login button");
-		xpath = "//*[@id='demo']/div/div/div[2]/button";
+		xpath = "//article[@id='demo']/div/div/div[2]/button";
 		WebElement login = findElementByXpath(driver, xpath);
 		if (null == login) {
 			screenshot(driver, getPath(path));
@@ -122,7 +122,7 @@ public class WebIMTestBase {
 	}
 
 	public WebElement checkLogin(WebDriver driver) {
-		String xpath = "//*[@id='demo']/div/div/div[4]/div[1]/div[1]/img";
+		String xpath = "//article[@id='demo']/div/div/div[4]/div[1]/div[1]/img";
 		WebElement ele = null;
 		try {
 			ele = findElementByXpath(driver, xpath);
@@ -136,15 +136,15 @@ public class WebIMTestBase {
 	public WebElement findSpecialFriend(WebDriver driver, String username, String path) {
 		Preconditions.checkArgument(null != driver, "webdriver was missing");
 		Preconditions.checkArgument(StringUtils.isNotBlank(username), "friend name was missing!");
-		String xpath = "//*[@id='friends']/i[1]";
+		String xpath = "//div[@class='webim-leftbar']/div[@id='friends']/i[1]";
 		WebElement ele = findElement(driver, xpath, path);
-		if (ele.getAttribute("class").equals("accordion-toggle collapsed")) {
+		if (ele.getAttribute("class").equals("webim-leftbar-icon font small")) {
 			ele.click();
 		}
 		sleep(3);
-		xpath = "//*[@id='"+username+"']";
+		xpath = "//div[@class='webim-contact-wrapper']/div[1]/div[@id='"+username+"']";
 		ele = findElement(driver, xpath, path);
-		if (!StringUtils.isNotBlank(ele.getAttribute("style"))) {
+		if (StringUtils.isNotBlank(ele.getAttribute("class"))) {
 			ele.click();
 		}
 		return ele;
@@ -157,10 +157,10 @@ public class WebIMTestBase {
 		Preconditions.checkArgument(StringUtils.isNotBlank(msg), "message was missing");
 		WebElement wet = checkLogin(driver);
 		Assert.assertTrue(null != wet && wet.isDisplayed(), "check login web page");
-		String xpath = "//div[@id='" + username1 + "-" + username2 + "']";
+		String xpath = "//div[@class='webim-chatwindow ']/div[@id='wrapper"+username2+"']";
 		WebElement ele = findElement(driver, xpath, path);
 		try {
-			List<WebElement> eles = ele.findElements(By.xpath("//p[@class='chat-content-p3']"));
+			List<WebElement> eles = ele.findElements(By.xpath("//pre"));
 			for (WebElement we : eles) {
 				if (we.getText().contains(msg)) {
 					logger.info("find message: {}", msg);
@@ -181,12 +181,13 @@ public class WebIMTestBase {
 		Preconditions.checkArgument(StringUtils.isNotBlank(filePath) && StringUtils.isNotBlank(data_type),
 				"file path or data type was missing");
 		logger.info("find file input");
-		String xpath = "//input[@id='fileInput']";
+		String xpath = "//input[@id='uploadShim']";
 		WebElement ele = findElement(driver, xpath, path);
 		sleep(1);
 		logger.info("reset file input property");
 		JavascriptExecutor jse = (JavascriptExecutor) driver;
-		jse.executeScript("$('#fileInput').show(); $('#fileInput').attr('data-type', '" + data_type + "');");
+//		jse.executeScript("$('#uploadShim').show(); $('#uploadShim').attr('data-type', '" + data_type + "');");
+		jse.executeScript("var fileele = document.getElementById('uploadShim'); fileele.style.display='block';fileele.setAttribute('data-type','" + data_type + "');");
 		sleep(3);
 		File file = new File(filePath);
 		String str = null;
@@ -195,25 +196,27 @@ public class WebIMTestBase {
 			str = file.getAbsolutePath();
 		}
 		Assert.assertNotNull(str, "resource file path");
-		ele.sendKeys(str);
-		sleep(10);
+		str = "C:/Users/Public/test_img.png";
+		ele.sendKeys(str); 
+		sleep(1);
 		logger.info("set back file input property");
-		jse.executeScript("$('#fileInput').hide();");
+		sleep(3);
+		jse.executeScript("var fileele = document.getElementById('uploadShim'); fileele.style.display='none'");
 	}
 
 	public void logout(WebDriver driver, String path) {
 		Preconditions.checkArgument(null != driver, "webdriver was missing");
 		logger.info("click logout button");
-		String xpath = "//button[@class='btn btn-inverse dropdown-toggle'][@data-toggle='dropdown']";
+		String xpath = "//div[@class='webim-leftbar']/div[6]/i";
 		WebElement ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(1);
-		xpath = "//li[@onclick='logout();']";
+		xpath = "//div[@class='webim-leftbar']/div[6]/ul[@class='webim-operations']/li[3]";
 		ele = findElement(driver, xpath, path);
 		ele.click();
 		sleep(3);
 		logger.info("find login button");
-		xpath = "//button[@class='flatbtn-blu'][@tabindex='4']";
+		xpath = "//div[@class='webim-sign']/p/i";
 		findElement(driver, xpath, path);
 	}
 
@@ -269,44 +272,49 @@ public class WebIMTestBase {
 	
 	public WebElement findSpecialGroup(WebDriver driver, String groupId, String path) {
 		Preconditions.checkArgument(null != driver, "webdriver was missing");
-		String xpath = "//a[@id='accordion2']";
+		String xpath = "//div[@class='webim-chat']/div[@class='webim-leftbar']/div[@id='groups']/i";
 		WebElement ele = findElement(driver, xpath, path);
-		if (ele.getAttribute("class").equals("accordion-toggle collapsed")) {
+		if (ele.getAttribute("class").equals("webim-leftbar-icon font small")) {
 			ele.click();
 			sleep(1);
+			logger.info("test");
 		}
 		if (StringUtils.isNotBlank(groupId)) {
 			logger.info("select group: {}", groupId);
-			xpath = "//ul[@id='contracgrouplistUL']/li[@id='" + groupId + "']";
-		} else {
+			xpath = "//div[@class='webim-chat']/div[@class='webim-contact-wrapper']/div[2]/div[@id='" + groupId + "']";
+			logger.info("here1");
+		} 
+		else {
 			logger.info("select first group");
-			xpath = "//ul[@id='contracgrouplistUL']/li[1]";
+			xpath = "//div[@class='webim-chat']/div[@class='webim-contact-wrapper']/div[2]/div[1]";
+			logger.info("here2");
 		}
 		ele = findElement(driver, xpath, path);
-		if (!StringUtils.isNotBlank(ele.getAttribute("style"))) {
+		if (StringUtils.isNotBlank(ele.getAttribute("class"))) {
 			ele.click();
 			sleep(1);
+			logger.info("test1");
 		}
 		return ele;
 	}
 	
 	public WebElement findSpecialChatroom(WebDriver driver, String chatroomId, String path) {
 		Preconditions.checkArgument(null != driver, "webdriver was missing");
-		String xpath = "//a[@id='accordion4']";
+		String xpath = "//div[@class='webim-chat']/div[@class='webim-leftbar']/div[@id='chatrooms']/i";
 		WebElement ele = findElement(driver, xpath, path);
-		if (ele.getAttribute("class").equals("accordion-toggle collapsed")) {
+		if (ele.getAttribute("class").equals("webim-leftbar-icon font small")) {
 			ele.click();
 			sleep(1);
 		}
 		if (StringUtils.isNotBlank(chatroomId)) {
 			logger.info("select chatroom: {}", chatroomId);
-			xpath = "//ul[@id='chatRoomListUL']/li[@id='" + chatroomId + "']";
+			xpath = "//div[@class='webim-contact-wrapper']/div[3]/div[@id='" + chatroomId + "']";
 		} else {
 			logger.info("select first chatroom");
-			xpath = "//ul[@id='chatRoomListUL']/li[1]";
+			xpath = "//div[@class='webim-contact-wrapper']/div[3]/div[1]";
 		}
 		ele = findElement(driver, xpath, path);
-		if (!StringUtils.isNotBlank(ele.getAttribute("style"))) {
+		if (StringUtils.isNotBlank(ele.getAttribute("class"))) {
 			ele.click();
 			sleep(5);
 		}
